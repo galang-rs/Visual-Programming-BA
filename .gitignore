@@ -30,3 +30,7 @@ Thumbs.db
 # Temporary and Scratch
 *.tmp
 *.bak
+
+# Submission Archives
+dikumpulkan/
+*.zip
