@@ -1,0 +1,27 @@
+# Gradle and Build directories
+.gradle/
+build/
+*/build/
+*/*/build/
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+.navigation/
+captures/
+local.properties
+.cxx/
+
+# Backend Data / Databases
+backend/data/
+*.mv.db
+*.trace.db
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db
+
+# Temporary and Scratch
+*.tmp
+*.bak

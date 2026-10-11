@@ -1,0 +1,384 @@
+{
+	"info": {
+		"_postman_id": "ecosort-api-collection-v1",
+		"name": "EcoSort - Bank Sampah & Circular Economy API",
+		"description": "Koleksi API Lengkap EcoSort untuk Pengujian Backend Spring Boot 3-Tier Layered.\nMendukung Autentikasi JWT Bearer, Role WARGA, dan Role PETUGAS.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "tokenWarga",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tokenPetugas",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Autentikasi & Akun",
+			"item": [
+				{
+					"name": "Login Petugas (1-Tap Test)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneNumber\": \"081234567890\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login sebagai Petugas. Salin token dari respon ke variabel tokenPetugas."
+					}
+				},
+				{
+					"name": "Login Warga (1-Tap Test)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneNumber\": \"081987654321\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login sebagai Warga (Siti Aminah). Salin token dari respon ke variabel tokenWarga."
+					}
+				},
+				{
+					"name": "Registrasi Warga Baru",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Budi Santoso\",\n  \"phoneNumber\": \"085712349999\",\n  \"address\": \"Jl. Melati No. 12, RW 05\",\n  \"password\": \"password123\",\n  \"role\": \"WARGA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Cek Profil Pengguna (Me)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenWarga}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "profile"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Katalog Komoditas & Kalkulator",
+			"item": [
+				{
+					"name": "Ambil Seluruh Katalog Sampah",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog"]
+						},
+						"description": "Mendapatkan daftar kategori sampah anorganik (PET, Kardus, Kaleng, Kaca, Kertas) beserta tarif aktif dan panduan pemilahan."
+					}
+				},
+				{
+					"name": "Simulasi Kalkulator Sampah",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryId\": 1,\n  \"weightKg\": 5.0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/calculate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "calculate"]
+						},
+						"description": "Menghitung estimasi rupiah berdasarkan kategori sampah dan berat timbangan."
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Penyetoran Sampah (Pos Petugas)",
+			"item": [
+				{
+					"name": "Input Setoran Fisik Sampah (Role: PETUGAS)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenPetugas}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"citizenId\": 2,\n  \"categoryId\": 1,\n  \"weightKg\": 5.08,\n  \"notes\": \"Botol plastik PET kering dan bersih tanpa tutup\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/deposits",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "deposits"]
+						},
+						"description": "Petugas mencatat penimbangan fisik. Mengkredit saldo nasabah dan mencatat pengeluaran di buku kas secara atomik (@Transactional)."
+					}
+				},
+				{
+					"name": "Riwayat Setoran Saya (Role: WARGA)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenWarga}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/deposits/my-deposits",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "deposits", "my-deposits"]
+						}
+					}
+				},
+				{
+					"name": "Semua Riwayat Setoran (Role: PETUGAS)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenPetugas}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/deposits/all",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "deposits", "all"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Reward Sembako & Voucher Klaim",
+			"item": [
+				{
+					"name": "Daftar Item Reward Sembako",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/rewards",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "rewards"]
+						}
+					}
+				},
+				{
+					"name": "Klaim Paket Reward (Role: WARGA)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenWarga}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rewardItemId\": 3\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/rewards/claim",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "rewards", "claim"]
+						},
+						"description": "Menukar saldo tabungan dengan paket sembako. Menerbitkan kode voucher unik format ECO-XXXXXX."
+					}
+				},
+				{
+					"name": "Verifikasi Kode Voucher Fisik (Role: PETUGAS)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenPetugas}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"voucherCode\": \"ECO-YSPRVP\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/rewards/verify-claim",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "rewards", "verify-claim"]
+						},
+						"description": "Petugas memvalidasi kode voucher nasabah dan mengubah status menjadi COMPLETED saat penyerahan sembako fisik."
+					}
+				},
+				{
+					"name": "Riwayat Voucher Klaim Saya (Role: WARGA)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenWarga}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/rewards/my-claims",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "rewards", "my-claims"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Buku Kas & Manajemen Nasabah",
+			"item": [
+				{
+					"name": "Ringkasan Buku Kas Bank Sampah (Role: PETUGAS)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenPetugas}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/cashbook/summary",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cashbook", "summary"]
+						}
+					}
+				},
+				{
+					"name": "Daftar Warga / Nasabah (Role: PETUGAS)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{tokenPetugas}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/users/citizens",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "citizens"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
