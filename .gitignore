@@ -22,6 +22,11 @@ backend/data/
 .DS_Store
 Thumbs.db
 
+# Environment Configuration
+.env
+*.env.local
+!.env.example
+
 # Temporary and Scratch
 *.tmp
 *.bak

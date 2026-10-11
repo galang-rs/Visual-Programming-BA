@@ -33,6 +33,9 @@ dependencies {
     // Swagger / OpenAPI UI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
+    // Dotenv (.env environment variable loader)
+    implementation("io.github.cdimascio:dotenv-java:3.0.0")
+
     // JWT (JJWT)
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")

@@ -12,12 +12,14 @@ Sistem ini terbagi secara modular menjadi dua sub-proyek utama:
 
 ```text
 E:\ciputra\visual\afl3\
+├── .env.example                    # Template konfigurasi variabel lingkungan sistem
 ├── README.md                       # Dokumentasi arsitektur dan panduan eksekusi sistem
 ├── EcoSort_Postman_Collection.json # Koleksi Postman lengkap siap pakai
 ├── screenshots/                    # Dokumentasi tangkapan layar pengujian aplikasi di Android
 │
 ├── backend/                        # Peladen REST API Spring Boot 3-Tier Layered
-│   ├── build.gradle.kts            # Konfigurasi dependensi Gradle Spring Boot, JPA, JWT, Swagger
+│   ├── .env.example                # Template konfigurasi port, DB, dan JWT secret backend
+│   ├── build.gradle.kts            # Konfigurasi dependensi Gradle Spring Boot, JPA, JWT, Swagger, Dotenv
 │   ├── settings.gradle.kts         # Root project settings backend
 │   ├── gradlew / gradlew.bat       # Wrapper Gradle portable
 │   └── src/
@@ -106,6 +108,36 @@ Saat peladen pertama kali dijalankan, `DataSeeder.java` akan otomatis mengisi da
 
 ### 1. Menjalankan Backend (Spring Boot)
 
+Backend EcoSort telah mendukung manajemen variabel lingkungan menggunakan pustaka **Dotenv (`dotenv-java`)**. 
+
+#### Konfigurasi File `.env`:
+Tersedia template konfigurasi pada `.env.example`. Anda dapat menyalinnya menjadi `.env` pada direktori root atau `backend/`:
+
+```powershell
+# Menggunakan template bawaan
+Copy-Item .env.example .env
+```
+
+Berkas `.env` memuat variabel yang dapat dikonfigurasi secara fleksibel:
+```properties
+# Port peladen Spring Boot
+SERVER_PORT=8080
+APP_NAME=ecosort-backend
+
+# Konfigurasi Basis Data (Default H2 File DB atau PostgreSQL)
+DB_URL=jdbc:h2:file:./data/ecosortdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+DB_DRIVER=org.h2.Driver
+DB_USERNAME=sa
+DB_PASSWORD=
+
+# Kunci Rahasia JWT & Masa Berlaku Token
+JWT_SECRET=9a3f9e6b2c8a1f5d7e3c4b9a0f2e8d1c6b4a7f9e2d5c8a1f4b7e0d3c6a9f2b5e
+JWT_EXPIRATION_MS=86400000
+```
+
+> **Catatan Fleksibilitas**: Jika berkas `.env` tidak disediakan, peladen secara cerdas menggunakan nilai bawaan (*fallback default*) yang telah didefinisikan pada `application.properties`, sehingga sistem tetap dapat berjalan langsung tanpa hambatan.
+
+#### Perintah Eksekusi Backend:
 Buka terminal PowerShell pada direktori `backend/`:
 
 ```powershell
